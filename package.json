@@ -1,0 +1,19 @@
+{
+  "name": "openapi-public-content-e2e",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test --project=chromium ",
+    "test:ui": "npx playwright test --ui",
+    "report": "npx playwright show-report",
+    "update-snapshots": "npx playwright test --update-snapshots"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.0"
+  }
+}
