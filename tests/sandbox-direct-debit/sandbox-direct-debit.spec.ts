@@ -72,5 +72,7 @@ test.describe('Sandbox direct debit page', () => {
       fullPage: true,
       animations: 'disabled',
     })
+
+    await expect(await page.screenshot({ animations: 'disabled', fullPage: true })).toMatchSnapshot(screenshotPath)
   })
 })
