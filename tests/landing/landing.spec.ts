@@ -1,77 +1,89 @@
 import { test, expect } from '@playwright/test'
-import fs from 'fs'
-import path from 'path'
 
-const timeout = 30000
-const waitTimeout = 3000
+const PAGE_LOAD_TIMEOUT = 30000
+const WAIT_TIMEOUT = 3000
 
-const url = process.env.URL || 'https://developers.krungthai.com/'
+test.describe('Landing Page Actions', async () => {
+  test.beforeEach(async ({ page, baseURL }) => {
+    await page.goto(baseURL || '', { timeout: PAGE_LOAD_TIMEOUT })
+  })
 
-test.describe('Landing page', () => {
-  test.beforeAll(async () => {
-    // Create screenshot directory
-    const screenshotDir = path.join(process.cwd(), '_screenshot_')
-    if (!fs.existsSync(screenshotDir)) {
-      fs.mkdirSync(screenshotDir, { recursive: true })
-      console.log(`📁 Created directory: ${screenshotDir}`)
+  test('should navigate to Getting Started page when clicking Get Started button', async ({ page, baseURL }) => {
+    await page.locator('[data-test-id="btnGetStarted"]').click()
+    const expectedPath = `${baseURL}/documentation/introduction/getting-started/`
+
+    await expect(page).toHaveURL(expectedPath)
+    await page.waitForTimeout(WAIT_TIMEOUT)
+    await expect(page.locator('[data-test-id="conBanner"] [data-test-id="lblTitle"]')).toMatchAriaSnapshot(`
+        - heading "Getting Started" [level=1]
+      `)
+  })
+
+  test('should navigate to Direct Debit Registration documentation when clicking first product button', async ({ page, baseURL }) => {
+    await page.locator('.btn.custom-btn.btn-large.AppItemImage_viewButton__ufUZx').first().click()
+    const expectedPath = `${baseURL}/documentation/direct-debit/direct-debit-registration/product-introduction/`
+
+    await expect(page).toHaveURL(expectedPath)
+    await page.waitForTimeout(WAIT_TIMEOUT)
+    await expect(page.locator('[data-test-id="conBanner"] [data-test-id="lblTitle"]')).toMatchAriaSnapshot(`
+          - heading "Direct Debit Registration" [level=1]
+      `)
+  })
+
+  test('should navigate to Direct Debit documentation when clicking first product button', async ({ page, baseURL }) => {
+    await page.locator('.col-xl-6 > .btn').first().click()
+    const expectedPath = `${baseURL}/documentation/direct-debit/direct-debit/product-introduction/`
+
+    await expect(page).toHaveURL(expectedPath)
+    await page.waitForTimeout(WAIT_TIMEOUT)
+    await expect(page.locator('[data-test-id="conBanner"] [data-test-id="lblTitle"]')).toMatchAriaSnapshot(`
+          - heading "Direct Debit" [level=1]
+      `)
+  })
+
+  test('should navigate to Authentication (App-to-App) documentation when clicking first product button', async ({ page, baseURL }) => {
+    await page.locator('div:nth-child(4) > .container > .row > #detail > .col-ml-5 > .btn').first().click()
+    const expectedPath = `${baseURL}/documentation/authentication/authentication-app-to-app/product-introduction/`
+
+    await expect(page).toHaveURL(expectedPath)
+    await page.waitForTimeout(WAIT_TIMEOUT)
+    await expect(page.locator('[data-test-id="conBanner"] [data-test-id="lblTitle"]')).toMatchAriaSnapshot(`
+          - heading "Authentication (App-to-App)" [level=1]
+      `)
+  })
+
+  test('should navigate to Authentication (QR Scan) documentation when clicking first product button', async ({ page, baseURL }) => {
+    await page.locator('div:nth-child(5) > .row > .col-xl-6.mt-5 > .btn').first().click()
+    const expectedPath = `${baseURL}/documentation/authentication/authentication-qr-scan/product-introduction/`
+
+    await expect(page).toHaveURL(expectedPath)
+    await page.waitForTimeout(WAIT_TIMEOUT)
+    await expect(page.locator('[data-test-id="conBanner"] [data-test-id="lblTitle"]')).toMatchAriaSnapshot(`
+          - heading "Authentication (QR Scan)" [level=1]
+      `)
+  })
+})
+
+test.describe('2-LEGGED Product card', () => {
+  test.beforeEach(async ({ page, baseURL }) => {
+    await page.goto(baseURL || '', { timeout: PAGE_LOAD_TIMEOUT })
+  })
+
+  test('should display 2-LEGGED Product card', async ({ page }) => {
+    const productCard = page.locator('[data-test-id="conProductList"]')
+    await expect(productCard).toBeVisible()
+    const productCardItem = productCard.locator('[data-test-id="conProductItem"]')
+    await expect(productCardItem).toHaveCount(3)
+    for (let i = 0; i < 3; i++) {
+      await expect(productCardItem.nth(i)).toBeVisible()
     }
   })
+})
 
-  test.beforeEach(async ({ page }) => {
-    // Navigate to the page
-    await page.goto('https://developers.krungthai.com/', {
-      waitUntil: 'load',
-      timeout: timeout,
-    })
-
-    // Additional wait for any dynamic content
-    await page.waitForTimeout(waitTimeout)
-    console.log('⏱️  Page preparation completed')
-  })
-
-  test('developers landing page has title', async ({ page }) => {
-    await page.goto(url)
-    await expect(page).toHaveTitle(/Krungthai Developers/)
-  })
-
-  test('take baseline screenshot of developers landing page', async ({ page }) => {
-    const screenshotPath = path.join(process.cwd(), '_screenshot_', 'krungthai-developers-baseline.png')
-
-    // Check if baseline already exists
-    if (fs.existsSync(screenshotPath)) {
-      const stats = fs.statSync(screenshotPath)
-      return
-    }
-
-    // Take baseline screenshot
-    await page.screenshot({
-      path: screenshotPath,
-      fullPage: true,
-      animations: 'disabled',
-    })
-
-    // Verify file was created
-    if (fs.existsSync(screenshotPath)) {
-      const stats = fs.statSync(screenshotPath)
-    } else {
-      throw new Error('Failed to create baseline screenshot')
-    }
-  })
-
-  test('Screenshots of developers landing page', async ({ page }) => {
-    await page.goto(url, { waitUntil: 'load', timeout: timeout })
-
-    // Additional wait for any dynamic content
-    await page.waitForTimeout(waitTimeout)
-
-    const screenshotPath = path.join(process.cwd(), 'screenshot', 'krungthai-developers-full.png')
-
-    // Take and compare screenshot
-    await expect(page).toHaveScreenshot(screenshotPath, {
-      fullPage: true,
-      animations: 'disabled',
-    })
-
-    await expect(await page.screenshot({ animations: 'disabled', fullPage: true })).toMatchSnapshot(screenshotPath)
+test.describe('Landing Page Visual Tests', () => {
+  test('should match full page screenshot baseline', async ({ page, baseURL }) => {
+    await page.goto(baseURL || '', { timeout: PAGE_LOAD_TIMEOUT })
+    await page.waitForTimeout(WAIT_TIMEOUT)
+    await expect(page).toHaveScreenshot({ fullPage: true })
   })
 })
