@@ -3,6 +3,22 @@ import { test, expect } from '@playwright/test'
 const PAGE_LOAD_TIMEOUT = 30000
 const WAIT_TIMEOUT = 3000
 
+// Expected product data for validation
+const EXPECTED_PRODUCTS = [
+  {
+    title: 'Fund Transfer to Krungthai Account',
+    description: 'Fund Transfer to Krungthai Account provides 24/7 real-time transfers for quick and seamless transactions.',
+  },
+  {
+    title: 'Fund Transfer to Other Bank Account',
+    description: 'Fund Transfer to Other Bank Account enables real-time, 24/7 transfers for seamless transactions to any bank.',
+  },
+  {
+    title: 'Fund Transfer to PromptPay',
+    description: 'Fund Transfer to PromptPay empowers instant transfers, 24/7 convenience, and seamless transactions.',
+  },
+] as const
+
 test.describe('Landing Page Actions', async () => {
   test.beforeEach(async ({ page, baseURL }) => {
     await page.goto(baseURL || '', { timeout: PAGE_LOAD_TIMEOUT })
@@ -75,7 +91,23 @@ test.describe('2-LEGGED Product card', () => {
     const productCardItem = productCard.locator('[data-test-id="conProductItem"]')
     await expect(productCardItem).toHaveCount(3)
     for (let i = 0; i < 3; i++) {
-      await expect(productCardItem.nth(i)).toBeVisible()
+      const productItem = productCardItem.nth(i)
+      await expect(productItem).toBeVisible()
+
+      // Verify title matches expected
+      await expect(productItem).toContainText(EXPECTED_PRODUCTS[i].title)
+
+      // Verify description matches expected
+      await expect(productItem).toContainText(EXPECTED_PRODUCTS[i].description)
+
+      // Verify View button is present and visible
+      const viewButton = productItem.locator('button:has-text("View")')
+      await expect(viewButton).toBeVisible()
+
+      // Verify Fund Transfer tag is present
+      const badge = productItem.locator('[data-test-id="bdgLabel"]')
+      await expect(badge).toBeVisible()
+      await expect(badge).toContainText('Fund Transfer')
     }
   })
 })
