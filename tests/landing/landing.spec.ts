@@ -1,23 +1,8 @@
 import { test, expect } from '@playwright/test'
+import { EXPECTED_PRODUCTS } from './config'
 
 const PAGE_LOAD_TIMEOUT = 30000
 const WAIT_TIMEOUT = 3000
-
-// Expected product data for validation
-const EXPECTED_PRODUCTS = [
-  {
-    title: 'Fund Transfer to Krungthai Account',
-    description: 'Fund Transfer to Krungthai Account provides 24/7 real-time transfers for quick and seamless transactions.',
-  },
-  {
-    title: 'Fund Transfer to Other Bank Account',
-    description: 'Fund Transfer to Other Bank Account enables real-time, 24/7 transfers for seamless transactions to any bank.',
-  },
-  {
-    title: 'Fund Transfer to PromptPay',
-    description: 'Fund Transfer to PromptPay empowers instant transfers, 24/7 convenience, and seamless transactions.',
-  },
-] as const
 
 test.describe('Landing Page Actions', async () => {
   test.beforeEach(async ({ page, baseURL }) => {
@@ -108,6 +93,16 @@ test.describe('2-LEGGED Product card', () => {
       const badge = productItem.locator('[data-test-id="bdgLabel"]')
       await expect(badge).toBeVisible()
       await expect(badge).toContainText('Fund Transfer')
+
+      // Verify link URL is correct
+      const link = productItem.locator('a')
+      const href = await link.getAttribute('href')
+      const expectedLinks = [
+        '/documentation/fund-transfer/fund-transfer-to-krungthai-account/product-introduction/',
+        '/documentation/fund-transfer/fund-transfer-to-other-bank-account/product-introduction/',
+        '/documentation/fund-transfer/fund-transfer-to-prompt-pay/product-introduction/',
+      ]
+      expect(href).toBe(expectedLinks[i])
     }
   })
 })
