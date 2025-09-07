@@ -7,6 +7,7 @@ const WAIT_TIMEOUT = 3000
 test.describe('API Product List - Backend Integration', () => {
   test.beforeEach(async ({ page, baseURL }) => {
     await page.goto(`${baseURL}/api-products/` || '', { timeout: PAGE_LOAD_TIMEOUT })
+    await page.waitForTimeout(WAIT_TIMEOUT)
   })
 
   test('should successfully fetch API product list with populated image and button data', async ({ page }) => {
@@ -24,6 +25,7 @@ test.describe('API Product List - Backend Integration', () => {
 test.describe('API Product Cards - Frontend UI Component Validation', () => {
   test.beforeEach(async ({ page, baseURL }) => {
     await page.goto(`${baseURL}/api-products/` || '', { timeout: PAGE_LOAD_TIMEOUT })
+    await page.waitForTimeout(WAIT_TIMEOUT)
   })
 
   test('should render complete product card layout with all required UI elements', async ({ page }) => {
@@ -43,9 +45,9 @@ test.describe('API Product Cards - Frontend UI Component Validation', () => {
     for (let i = 0; i < cardCount; i++) {
       const productCard = productCards.nth(i)
       const productImage = productCard.locator('img')
-
+      const RESOURCE_BASE_URL = process.env.RESOURCE_BASE_URL
       await expect(productImage).toBeVisible()
-      await expect(productImage).toHaveAttribute('src', /https:\/\/storage\.googleapis\.com\/oapi-content-management-prd\//)
+      await expect(productImage).toHaveAttribute('src', new RegExp(`${RESOURCE_BASE_URL}/`))
 
       // Ensure image is loaded and not broken
       const imageUrl = await productImage.getAttribute('src')
@@ -108,7 +110,8 @@ test.describe('API Product Cards - Frontend UI Component Validation', () => {
       // Validate image with Google Cloud Storage URL
       const image = productCard.locator('img')
       await expect(image).toBeVisible()
-      await expect(image).toHaveAttribute('src', /https:\/\/storage\.googleapis\.com\/oapi-content-management-prd\//)
+      const RESOURCE_BASE_URL = process.env.RESOURCE_BASE_URL
+      await expect(image).toHaveAttribute('src', new RegExp(`${RESOURCE_BASE_URL}/`))
 
       // Validate title matches expected content
       const title = productCard.locator('h3')
