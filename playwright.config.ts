@@ -38,11 +38,20 @@ export default defineConfig({
     {
       name: 'sit',
       use: {
-        baseURL: 'https://developers.krungthai.com',
+        baseURL: 'https://partner-oapi-portal-sit.arisetech.dev',
         ...devices['Desktop Chrome'],
       },
       retries: 2,
     },
+    // {
+    //   name: 'prod',
+    //   use: {
+    //     baseURL: 'https://developers.krungthai.com',
+    //     ...devices['Desktop Chrome'],
+    //   },
+    //   retries: 1,
+    // },
+
     // {
     //   name: 'staging',
     //   use: {
